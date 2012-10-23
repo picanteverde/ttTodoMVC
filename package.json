@@ -1,0 +1,22 @@
+{
+  "name": "ttTodoMVC",
+  "title": "Todo MVC",
+  "description": "Exercise on a Todo app with MVC Backbone.js Boilerplate and REST api",
+  "version": "0.0.1",
+  "homepage": "https://github.com/picanteverde/ttTodoMVC",
+  "author":{
+    "name": "Alejandro Hernández"
+  },
+  "dependencies": {
+    "express": ">= 3.0.x",
+    "mongodb": ">= 1.1.10"
+  },
+  "devDependencies":{
+    "mocha": ">= 1.3.x",
+    "chai": ">= 0.4.0"
+  },
+  "engines": {
+    "node": "0.8.x",
+    "npm": "1.1.x"
+  }
+}
