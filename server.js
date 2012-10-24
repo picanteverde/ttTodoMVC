@@ -37,6 +37,9 @@ driver.open(function(err,db){
 		}else{
 			next();
 		}
+	},
+	sendApp = function(req, res, next){
+		res.sendfile("./public/index.html");
 	};
 	app.post('/api/login', function(req, res, next){
 		if(req.body.username && req.body.password){
@@ -52,6 +55,13 @@ driver.open(function(err,db){
 			res.json({"error":"Username and Password required"});
 		}
 	});
+	app.get("/api/login", function(req, res, next){
+		if(req.session.username){
+			res.json({auth: req.session.username});
+		}else{
+			res.json({auth: false});
+		}
+	});
 
 	app.get("/api/todos",[authorize] ,function(req, res, next){
 		db.getTodos(req.session.username, function(err, todos){
@@ -61,6 +71,37 @@ driver.open(function(err,db){
 			res.json({"todos":todos});
 		});
 	});
+	app.post("/api/todos",[authorize],function(req, res, next){
+		var todo = {
+			username: req.session.username,
+			task: req.body.task,
+			priority: req.body.priority,
+			done: req.body.done
+		};
+		db.addTodo(req.session.username,todo,
+			function(err, result){
+				todo._id = result;
+				res.json(todo);
+		});
+	});
+	app.put("/api/todos/:id",[authorize], function(req,res, next){
+		var todo = {
+			username: req.session.username,
+			task: req.body.task,
+			priority: req.body.priority,
+			done: req.body.done
+		};
+		db.updateTodo(req.session.username, req.params.id, todo, function(err, result){
+			res.json(result);
+		});
+	});
+	app.delete("/api/todos/:id",[authorize], function(req, res, next){
+		db.removeTodo(req.session.username, req.params.id, function(err, result){
+			res.json(result);
+		});
+	});
+	app.get("/login",sendApp);
+	app.get("/todos",sendApp);
 	console.log("Database connection stablished!");
 });
 

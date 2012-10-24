@@ -32,6 +32,7 @@ define([
             $("#login-error").text(data.error).show();
           }else{
             $("#login-error").text("Success!").show();
+            app.router.navigate("/todos",{trigger: true});
           }
         }
       });

@@ -1,3 +1,4 @@
 node_modules/
+mongo/db/
 *.log
 npm-debug.log

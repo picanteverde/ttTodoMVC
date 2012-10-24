@@ -1,6 +1,7 @@
 module.exports = function(mongo){
 	var Db = mongo.Db,
 		Connection = mongo.Connection,
+		ObjectID = mongo.ObjectID,
 		Server = mongo.Server,
 		config = config || {},
 		db = config.db || "ttTodoMVC",
@@ -54,6 +55,60 @@ module.exports = function(mongo){
 								cursor.toArray(function(err, todos){
 									cb(err,todos);
 								});
+							});
+						});
+					},
+					addTodo: function(username, todo, cb){
+						client.collection(todoColl, function(err, collection){
+							if(err){
+								cb(err);
+							}
+							collection.insert({
+									username: username,
+									task: todo.task,
+									priority: todo.priority,
+									done: todo.done
+								},
+								{safe:true}, function(err, result){
+								if(err){
+									cb(err);
+								}
+								cb(err, result[0]._id.toString());
+							});
+						});
+					},
+					removeTodo: function(username, id, cb){
+						client.collection(todoColl, function(err, collection){
+							if(err){
+								cb(err);
+							}
+							collection.remove({
+								username: username,
+								"_id": new ObjectID.createFromHexString(id)
+							}, {safe: true},
+							function(err, result){
+								cb(result);
+							});
+						});
+					},
+					updateTodo: function(username, id, todo, cb){
+						client.collection(todoColl, function(err, collection){
+							if(err){
+								cb(err);
+							}
+							collection.update({
+								username: username,
+								"_id": new ObjectID.createFromHexString(id)
+							},
+							{
+								"$set": {
+									task: todo.task,
+									priority: todo.priority,
+									done: todo.done
+								}
+							}, {safe: true},
+							function(err, result){
+								cb(err, result);
 							});
 						});
 					}
