@@ -55,12 +55,16 @@ define([
 				addOne: function(todo){
 					var view = new TodoView({model: todo});
 					this.insertView(view).render();
+					console.log("insertView");
 				},
 				addAll: function(){
 					var that = this;
 					that.collection.each(function(item){
 						that.addOne(item);
 					});
+				},
+				beforeRender: function(){
+					console.log("br TodoLisView");
 				}
 			}),
 			TodosView = Backbone.View.extend({
@@ -75,8 +79,15 @@ define([
 					});
 					this.collection.on("add", this.todoList.addOne, this.todoList);
 					this.collection.on('reset',this.todoList.addAll, this.todoList);
-					this.collection.fetch();
+					
+				},
+				beforeRender: function(){
 					this.setView(".list", this.todoList);
+					console.log("br TodosView");
+				},
+				afterRender: function(){
+					this.collection.fetch();
+					console.log("fetch");
 				},
 				add: function(){
 					if(!$("#todo-new").val()) return;
