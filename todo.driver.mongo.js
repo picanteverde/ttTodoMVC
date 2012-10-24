@@ -43,6 +43,31 @@ module.exports = function(mongo){
 							});
 						});
 					},
+					createUser: function(user, cb){
+						client.collection(profilesColl, function(err, collection){
+							if(err){
+								cb(err);
+							}
+							collection.findOne({
+								username: user.username
+							}, function(err, o_user){
+								if(err){
+									cb(err);
+								}
+								if(!o_user){
+									collection.insert({
+										username: user.username,
+										password: user.password
+									},{ safe: true },
+									function(err, result){
+										cb(err,true);
+									});
+								}else{
+									cb(err,false);
+								}
+							});
+						});
+					},
 					getTodos: function(username, cb){
 						client.collection(todoColl,function(err, collection){
 							if(err){

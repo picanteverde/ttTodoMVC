@@ -2,17 +2,19 @@ define([
   // Application.
   "app",
   "modules/login",
-  "modules/todos"
+  "modules/todos",
+  "modules/register"
 ],
 
-function(app, Login, Todos) {
+function(app, Login, Todos, Register) {
 
   // Defining the application router, you can attach sub routers here.
   var Router = Backbone.Router.extend({
     routes: {
       "": "index",
       "login": "login",
-      "todos": "todos"
+      "todos": "todos",
+      "register": "register"
     },
 
     index: function() {
@@ -37,13 +39,15 @@ function(app, Login, Todos) {
     },
     login: function(){
       app.useLayout("main");
-      app.layout.setView('#main-content', new Login.Views.Form());
-      app.layout.render();
+      app.layout.setView('#main-content', new Login.Views.Form()).render();
     },
     todos: function(){
       app.useLayout("main");
-      app.layout.setView('#main-content', new Todos());
-      app.layout.render();
+      app.layout.setView('#main-content', new Todos()).render();
+    },
+    register: function(){
+      app.useLayout("main");
+      app.layout.setView('#main-content', new Register()).render();
     }
   });
 

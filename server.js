@@ -52,7 +52,24 @@ driver.open(function(err,db){
 				}
 			});
 		}else{
-			res.json({"error":"Username and Password required"});
+			res.json({"error":"Username and Password required!"});
+		}
+	});
+	app.post("/api/register", function(req, res, next){
+		if(req.body.username && req.body.password){
+			db.createUser({
+				username: req.body.username,
+				password: req.body.password
+			},
+			function(err, created){
+				if(created){
+					res.json({"auth":true});
+				}else{
+					res.json({"error": "Username already exist!"});
+				}
+			});
+		}else{
+			res.json({"error":"Username and Password required!"});
 		}
 	});
 	app.get("/api/login", function(req, res, next){
@@ -102,6 +119,7 @@ driver.open(function(err,db){
 	});
 	app.get("/login",sendApp);
 	app.get("/todos",sendApp);
+	app.get("/register",sendApp);
 	console.log("Database connection stablished!");
 });
 
