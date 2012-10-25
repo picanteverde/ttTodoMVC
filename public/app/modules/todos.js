@@ -58,10 +58,12 @@ define([
 					console.log("insertView");
 				},
 				addAll: function(){
-					var that = this;
-					that.collection.each(function(item){
-						that.addOne(item);
-					});
+					var i,
+						models = this.collection.models,
+						length = models.length;
+					for(i = 0; i < length; i += 1){
+						this.addOne(models[i]);
+					}
 				},
 				beforeRender: function(){
 					console.log("br TodoLisView");
