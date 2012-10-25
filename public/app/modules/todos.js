@@ -88,6 +88,7 @@ define([
 					console.log("br TodosView");
 				},
 				afterRender: function(){
+					this.$("#todo-new").focus();
 					this.collection.fetch();
 					console.log("fetch");
 				},

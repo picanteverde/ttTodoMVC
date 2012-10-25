@@ -7,7 +7,31 @@
  * Note: All stylesheets are relative to `assets/css`.
  *
  */ 
+div.todo-app{
 
+}
+div#main-content{
+	background-color: #EEEEEE;
+	border: 1px solid #CCCCCC;
+}
+ul.nav-bar{
+	padding-left: 0em;
+}
+ul.nav-bar li{
+	display: inline-block;
 
+}
+ul.nav-bar li a{
+	padding-left: 1em;
+	padding-right: 1em;
+	background-color: #CCCCCC;
+	text-decoration: none;
+}
+
+/* Todo View */
+div.todos-todo input.todo-priority{
+	width: 1em;
+}
+/* END - Todo View */
 
 /* Put development-only CSS below this line. */
