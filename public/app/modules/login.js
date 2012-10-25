@@ -1,5 +1,5 @@
 define([
-  "app",
+  "app"
   ], function(app){
 
   var Login = app.module();
