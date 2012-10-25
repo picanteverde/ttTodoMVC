@@ -43,6 +43,16 @@ module.exports = function(mongo){
 							});
 						});
 					},
+					getUser: function(username, cb){
+						client.collection(profilesColl, function(err,collection){
+							if(err){
+								cb(err);
+							}
+							collection.findOne({
+								username: username
+							}, cb);
+						});
+					},
 					createUser: function(user, cb){
 						client.collection(profilesColl, function(err, collection){
 							if(err){

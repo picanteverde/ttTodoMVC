@@ -1,6 +1,6 @@
 define([
-  "app",
-  ], function(app){
+  "app","jsSHA"
+  ], function(app, jsSHA){
 
   var Login = app.module();
 
@@ -26,21 +26,34 @@ define([
       }
     },
     login: function(evt){
+      var rnd = Math.random()*1000,
+        sign = "publicKey=" + $("#login-username").val() + "rnd="+rnd,
+        shaObj = new jsSHA(sign,"ASCII");
       evt.preventDefault();
       $("#login-error").hide();
+
       $.ajax({
-        url: "/api/login",
+        url: "/api/auth",
         type: "POST",
         dataType: "json",
         data: {
-          username: $("#login-username").val(),
-          password: $("#login-password").val()
+          publicKey: $("#login-username").val(),
+          rnd: rnd,
+          signature: shaObj.getHMAC($("#login-password").val(), "ASCII","HEX")
+        },
+        statusCode:{
+          401: function(data){
+            data = JSON.parse(data.responseText);
+            $("#login-error").text(data.error).show();
+          }
         },
         success: function(data){
           if(data.error){
             $("#login-error").text(data.error).show();
           }else{
             $("#login-error").text("Success!").show();
+            app.setKeys($("#login-username").val(),$("#login-password").val());
+            app.privateKey = $("#login-password").val();
             app.router.navigate("/todos",{trigger: true});
           }
         }

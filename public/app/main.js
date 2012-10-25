@@ -11,7 +11,7 @@ function(app, Router) {
   $.ajaxSetup({
     statusCode:{
       401: function(){
-        window.location.replace("/#login");
+        app.router.navigate("/login",{trigger: true});
       }
     }
   });

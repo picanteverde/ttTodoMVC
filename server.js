@@ -3,6 +3,7 @@ var express = require('express'),
 	driver = require('./todo.driver.mongo')(mongo),
 	http = require('http'),
 	path = require('path'),
+	jsSHA = require('./sha1'),
 	app = express();
 
 app.configure(function(){
@@ -31,30 +32,47 @@ app.configure('development', function() {
 
 driver.open(function(err,db){
 	var authorize = function(req, res, next){
-		if(!req.session.username){
+		var container = null, key, sign,shaObj;
+		if(req.body.publicKey && req.body.signature){
+			container = req.body;
+		}
+		if(req.query.publicKey && req.query.signature){
+			container = req.query;
+		}
+		if(!container){
 			res.status(401);
 			res.json({"error":"Authentication required!"});
 		}else{
-			next();
+			db.getUser(container.publicKey,function(err, user){
+				if(!user){
+					res.status(401);
+					res.json({"error":"Authentication required, invalid publicKey"});
+				}else{
+					sign = "";
+					for(key in container){
+						if(container.hasOwnProperty(key) && key !== "signature"){
+							sign += key + "=" +container[key];
+						}
+					}
+					shaObj = new jsSHA(sign, "ASCII");
+					sign = shaObj.getHMAC(user.password,"ASCII","HEX");
+					if(sign === container.signature){
+						next();
+					}else{
+						res.status(401);
+						res.json({"error":"Authentication required, Authentication failed!"});
+					};
+				}
+			});
 		}
 	},
 	sendApp = function(req, res, next){
 		res.sendfile("./public/index.html");
 	};
-	app.post('/api/login', function(req, res, next){
-		if(req.body.username && req.body.password){
-			db.login(req.body.username, req.body.password,function(err, auth){
-				if(auth){
-					req.session.username = req.body.username;
-					res.json({"auth":true, "username": req.body.username});
-				}else{
-					res.json({"error":"Username or Password not found!"});
-				}
-			});
-		}else{
-			res.json({"error":"Username and Password required!"});
-		}
+	app.post("/api/auth",[authorize], function(req, res, next){
+		res.json({"auth":true, "username": req.body.username});
 	});
+
 	app.post("/api/register", function(req, res, next){
 		if(req.body.username && req.body.password){
 			db.createUser({
@@ -72,16 +90,9 @@ driver.open(function(err,db){
 			res.json({"error":"Username and Password required!"});
 		}
 	});
-	app.get("/api/login", function(req, res, next){
-		if(req.session.username){
-			res.json({auth: req.session.username});
-		}else{
-			res.json({auth: false});
-		}
-	});
-
+	
 	app.get("/api/todos",[authorize] ,function(req, res, next){
-		db.getTodos(req.session.username, function(err, todos){
+		db.getTodos(req.query.publicKey, function(err, todos){
 			if(err){
 				res.json({"error":err});
 			}
@@ -90,12 +101,12 @@ driver.open(function(err,db){
 	});
 	app.post("/api/todos",[authorize],function(req, res, next){
 		var todo = {
-			username: req.session.username,
+			username: req.body.publicKey,
 			task: req.body.task,
 			priority: req.body.priority,
 			done: req.body.done
 		};
-		db.addTodo(req.session.username,todo,
+		db.addTodo(req.body.publicKey,todo,
 			function(err, result){
 				todo._id = result;
 				res.json(todo);
@@ -103,17 +114,17 @@ driver.open(function(err,db){
 	});
 	app.put("/api/todos/:id",[authorize], function(req,res, next){
 		var todo = {
-			username: req.session.username,
+			username: req.body.publicKey,
 			task: req.body.task,
 			priority: req.body.priority,
 			done: req.body.done
 		};
-		db.updateTodo(req.session.username, req.params.id, todo, function(err, result){
+		db.updateTodo(req.body.publicKey, req.params.id, todo, function(err, result){
 			res.json(result);
 		});
 	});
 	app.delete("/api/todos/:id",[authorize], function(req, res, next){
-		db.removeTodo(req.session.username, req.params.id, function(err, result){
+		db.removeTodo(req.body.publicKey, req.params.id, function(err, result){
 			res.json(result);
 		});
 	});

@@ -6,7 +6,8 @@ define([
   "handlebars",
 
   // Plugins.
-  "plugins/backbone.layoutmanager"
+  "plugins/backbone.layoutmanager",
+  "plugins/backbone.RESTFul.sync"
 ],
 
 function($, _, Backbone, Handlebars) {
@@ -16,7 +17,17 @@ function($, _, Backbone, Handlebars) {
   var app = {
     // The root path to run the application.
     root: "/",
-    loggedIn: false
+    loggedIn: false,
+    setKeys: function(publicKey, privateKey){
+      Backbone.sync.publicKey = publicKey;
+      Backbone.sync.privateKey = privateKey;
+      this.loggedIn=true;
+    },
+    unSetKeys: function(){
+      Backbone.sync.publicKey = null;
+      Backbone.sync.privateKey = null;
+      this.loggedIn=false;
+    }
   };
 
   // Localize or create a new JavaScript Template object.
