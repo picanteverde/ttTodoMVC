@@ -8,13 +8,22 @@ define([
     id: "login-form",
     template: "login-form",
     events: {
-      "click #login-button": "login"
+      "click #login-button": "login",
+      "keypress #login-password": "loginOnEnter"
     },
     initialize: function() {
       
     },
     beforeRender: function() {
       
+    },
+    afterRender: function(){
+      this.$("#login-username").focus();
+    },
+    loginOnEnter: function(e){
+      if(e.keyCode == 13){
+        this.login(e);
+      }
     },
     login: function(evt){
       evt.preventDefault();

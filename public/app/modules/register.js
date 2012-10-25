@@ -18,6 +18,10 @@ define([
     register: function(evt){
       evt.preventDefault();
       $("#register-error").hide();
+      if($("#register-password").val() !== $("#register-password-2").val()){
+        $("#register-error").text("Error! Re-entered password not matching").show();
+        return;
+      }
       $.ajax({
         url: "/api/register",
         type: "POST",
