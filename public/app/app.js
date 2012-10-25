@@ -112,7 +112,7 @@ function($, _, Backbone, Handlebars) {
       return layout;
     },
 
-    mediator: _.extend({}, Backbone.Events),
+    mediator: _.extend({}, Backbone.Events)
     
   }, Backbone.Events);
 
